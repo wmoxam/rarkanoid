@@ -22,7 +22,7 @@ class Ball
     @x += 0.3 * delta * Math.cos(@angle * Math::PI / 180)
     @y -= 0.3 * delta * Math.sin(@angle * Math::PI / 180)
 
-    @angle = if @bounced
+    @angle = if @last_touched == touching_wall
       @angle
     elsif touching_any_wall?
       (360 + (2 * wall_angle) - @angle) % 360
@@ -30,7 +30,7 @@ class Ball
       @angle
     end
 
-    @bounced = touching_any_wall?
+    @last_touched = touching_wall
 
     if out_of_bounds?
       paddle.reset!
@@ -42,12 +42,25 @@ class Ball
     end
   end
 
-  def wall_angle
+  def touching_wall
     if touching_container_right_side?
-      90
+      :right
     elsif touching_container_left_side?
+      :left
+    elsif touching_container_top?
+      :top
+    else
+      nil
+    end
+  end
+
+  def wall_angle
+    case touching_wall
+    when :right
+      90
+    when :left
       270
-    else # touching_container_top?
+    else # :top
       180
     end
   end
@@ -81,13 +94,13 @@ class Ball
   end
 
   def touching_any_wall?
-    touching_container_top? || touching_container_left_side? || touching_container_right_side?
+    !touching_wall.nil?
   end
 
   def reset!
     @x = 200
     @y = 200
     @angle = 45
-    @bounced = false
+    @last_touched = nil
   end
 end
