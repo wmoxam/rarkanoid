@@ -1,0 +1,12 @@
+#!/bin/sh
+
+mkdir tmp
+cd tmp
+wget http://slick.cokeandcode.com/downloads/slick.zip
+unzip slick.zip
+mv lib ..
+cd ..
+jar -xf lib/natives-linux.jar
+rm -r tmp
+
+echo "Installed!"

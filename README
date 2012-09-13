@@ -1,0 +1,8 @@
+Started via http://www.rubyinside.com/video-game-ruby-tutorial-5726.html
+
+Just playin'
+
+To play:
+	sudo apt-get install jruby
+	./install-libs
+	./run
