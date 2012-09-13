@@ -1,12 +1,25 @@
-#!/bin/sh
+#!/usr/bin/env jruby
 
-mkdir tmp
-cd tmp
-wget http://slick.cokeandcode.com/downloads/slick.zip
-unzip slick.zip
-mv lib ..
-cd ..
-jar -xf lib/natives-linux.jar
-rm -r tmp
+require 'net/http'
+require 'uri'
 
-echo "Installed!"
+def download(url, filename)
+  uri = URI.parse(url)
+  Net::HTTP.start(uri.host) do |http|
+    resp = http.get(uri.path)
+    open(filename, "wb") do |file|
+        file.write(resp.body)
+    end
+  end
+end
+
+Dir.mkdir 'tmp'
+Dir.chdir 'tmp'
+download 'http://slick.cokeandcode.com/downloads/slick.zip', 'slick.zip'
+`unzip slick.zip`
+`mv lib ..`
+Dir.chdir '..'
+`jar -xf lib/natives-#{`uname`.match(/Darwin/i) ? 'mac' : 'linux'}.jar`
+`rm -r tmp`
+
+puts "Installed!"
