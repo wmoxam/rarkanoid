@@ -19,8 +19,8 @@ class Ball
 
   def update(container, delta, paddle)
     @container = container
-    @x += 0.3 * delta * Math.cos(@angle * Math::PI / 180)
-    @y -= 0.3 * delta * Math.sin(@angle * Math::PI / 180)
+    @x += @speed * delta * Math.cos(@angle * Math::PI / 180)
+    @y -= @speed * delta * Math.sin(@angle * Math::PI / 180)
 
     @angle = if @last_touched == touching_wall
       @angle
@@ -66,7 +66,13 @@ class Ball
   end
 
   def angle_from_touched_position(paddle)
-    rand(90) + if touching_top_left?(paddle)
+    bounce_angle_multiplier = bounce_angle_multiplier_from_position(paddle)
+
+    if bounce_angle_multiplier >= 0.91 || bounce_angle_multiplier <= 0.09
+      increase_speed
+    end
+
+    (90 * bounce_angle_multiplier) + if touching_top_left?(paddle)
       90
     elsif touching_top_right?(paddle)
       0
@@ -74,6 +80,16 @@ class Ball
       180
     else
       270  # bottom right
+    end
+  end
+
+  def bounce_angle_multiplier_from_position(paddle)
+    percentage_of_distance_to_edge_from_middle = (paddle.mid_x - mid_x) / (paddle.width.to_f / 2)
+
+    if percentage_of_distance_to_edge_from_middle < 0
+      [0.05, 1 + percentage_of_distance_to_edge_from_middle].max
+    else
+      [percentage_of_distance_to_edge_from_middle, 0.95].min
     end
   end
 
@@ -97,10 +113,21 @@ class Ball
     !touching_wall.nil?
   end
 
+  def increase_speed
+    return if @speed >= 0.5
+    @speed += 0.05
+  end
+
+  def decrease_speed
+    return if @speed <= 0.15
+    @speed -= 0.05
+  end
+
   def reset!
     @x = 200
     @y = 200
     @angle = 45
     @last_touched = nil
+    @speed = 0.3
   end
 end

@@ -1,6 +1,8 @@
 class Paddle
   include CollisionMethods
 
+  attr_accessor :width, :height
+
   def initialize(image_path)
     @image = Image.new(image_path)
     @width = @image.width
