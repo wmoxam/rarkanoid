@@ -1,26 +1,25 @@
-require 'src/collision_methods'
+require File.dirname(__FILE__) + '/collision_methods'
 
 class Ball
   include CollisionMethods
 
   attr_accessor :angle, :x, :y
 
-  def initialize(image_path, container)
-    @image = Image.new(image_path)
+  def initialize(image_path, window)
+    @image = Gosu::Image.new(window, image_path, false)
     @width = @image.width
     @height = @image.height
-    @container = container
+    @window = window
     reset!
   end
 
   def draw
-    @image.draw(@x, @y)
+    @image.draw(@x, @y, ZOrder::Ball)
   end
 
-  def update(container, delta, paddle)
-    @container = container
-    @x += @speed * delta * Math.cos(@angle * Math::PI / 180)
-    @y -= @speed * delta * Math.sin(@angle * Math::PI / 180)
+  def update(paddle)
+    @x += @speed * Math.cos(@angle * Math::PI / 180)
+    @y -= @speed * Math.sin(@angle * Math::PI / 180)
 
     @angle = if @last_touched == touching_wall
       @angle
@@ -94,11 +93,11 @@ class Ball
   end
 
   def out_of_bounds?
-    top > @container.height + 30  # add some room to see the ball disappear
+    top > @window.height + 30  # add some room to see the ball disappear
   end
 
   def touching_container_right_side?
-    right > @container.width
+    right > @window.width
   end
 
   def touching_container_left_side?
@@ -114,13 +113,13 @@ class Ball
   end
 
   def increase_speed
-    return if @speed >= 0.5
-    @speed += 0.05
+    return if @speed >= 9
+    @speed += 1
   end
 
   def decrease_speed
-    return if @speed <= 0.15
-    @speed -= 0.05
+    return if @speed <= 3
+    @speed -= 1
   end
 
   def reset!
@@ -128,6 +127,6 @@ class Ball
     @y = 200
     @angle = 45
     @last_touched = nil
-    @speed = 0.3
+    @speed = 5
   end
 end

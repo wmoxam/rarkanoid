@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'gosu'
+
+require File.dirname(__FILE__) + '/src/arkanoid_game'
+
+game = ArkanoidGame.new
+game.show

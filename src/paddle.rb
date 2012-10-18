@@ -3,24 +3,25 @@ class Paddle
 
   attr_accessor :width, :height
 
-  def initialize(image_path)
-    @image = Image.new(image_path)
+  def initialize(image_path, window)
+    @image = Gosu::Image.new(window, image_path, false)
     @width = @image.width
     @height = @image.height
+    @window = window
     reset!
   end
 
   def draw
-    @image.draw(@x, @y)
+    @image.draw(@x, @y, ZOrder::Paddle)
   end
 
-  def handle_input(container, delta, input)
-    if input.is_key_down(Input::KEY_LEFT) && left > 0
-      @x -= 0.3 * delta
+  def handle_input
+    if @window.button_down?(Gosu::KbLeft) && left > 0
+      @x -= 5
     end
 
-    if input.is_key_down(Input::KEY_RIGHT) && right < container.width
-      @x += 0.3 * delta
+    if @window.button_down?(Gosu::KbRight) && right < @window.width
+      @x += 5
     end
   end
 
