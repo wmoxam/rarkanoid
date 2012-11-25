@@ -9,6 +9,7 @@ class ArkanoidGame < Gosu::Window
     @bg = Gosu::Image.new(self, "assets/bg.png", true)
     @ball = Ball.new('assets/ball.png', self)
     @paddle = Paddle.new('assets/paddle.png', self)
+    @ball.bind_to_paddle! @paddle
 
     @font = Gosu::Font.new(self, Gosu::default_font_name, 20)
   end
@@ -23,8 +24,13 @@ class ArkanoidGame < Gosu::Window
   def update
     close if button_down? Gosu::KbEscape
 
-    @paddle.handle_input
-    @ball.update(@paddle)
+    catch :out_of_bounds do
+      @paddle.handle_input
+      @ball.update(@paddle)
+      return
+    end
+    @paddle.reset!
+    @ball.bind_to_paddle! @paddle
   end
 end
 

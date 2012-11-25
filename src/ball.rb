@@ -10,7 +10,7 @@ class Ball
     @width = @image.width
     @height = @image.height
     @window = window
-    reset!
+    @state = nil
   end
 
   def draw
@@ -18,6 +18,8 @@ class Ball
   end
 
   def update(paddle)
+    return if bound_to_paddle?
+
     @x += @speed * Math.cos(@angle * Math::PI / 180)
     @y -= @speed * Math.sin(@angle * Math::PI / 180)
 
@@ -29,12 +31,9 @@ class Ball
       @angle
     end
 
+    throw :out_of_bounds if out_of_bounds?
+    
     @last_touched = touching_wall
-
-    if out_of_bounds?
-      paddle.reset!
-      reset!
-    end
 
     if touching?(paddle)
       @angle = angle_from_touched_position(paddle)
@@ -122,11 +121,24 @@ class Ball
     @speed -= 1
   end
 
-  def reset!
-    @x = 200
-    @y = 200
+  def bind_to_paddle!(paddle)
+    paddle.bound_ball = self
+
+    @state = :bound_to_paddle
+    @speed = 0
+    @bound_to_paddle = true
+    @x = paddle.x + ((paddle.width * 3 )/ 4)
+    @y = paddle.y - (paddle.height / 2) - @height / 2 + 2
     @angle = 45
     @last_touched = nil
+  end
+
+  def bound_to_paddle?
+    @state == :bound_to_paddle
+  end
+
+  def unbind_from_paddle!
+    @state = nil
     @speed = 5
   end
 end
