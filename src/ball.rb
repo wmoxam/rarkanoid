@@ -17,7 +17,7 @@ class Ball
     @image.draw(@x, @y, ZOrder::Ball)
   end
 
-  def update(paddle)
+  def update()
     return if bound_to_paddle?
 
     @x += @speed * Math.cos(@angle * Math::PI / 180)
@@ -34,10 +34,6 @@ class Ball
     throw :out_of_bounds if out_of_bounds?
     
     @last_touched = touching_wall
-
-    if touching?(paddle)
-      @angle = angle_from_touched_position(paddle)
-    end
   end
 
   def touching_wall
@@ -63,26 +59,30 @@ class Ball
     end
   end
 
-  def angle_from_touched_position(paddle)
-    bounce_angle_multiplier = bounce_angle_multiplier_from_position(paddle)
+  def update_angle(thing)
+    @angle = angle_from_touched_position(thing)
+  end
+
+  def angle_from_touched_position(thing)
+    bounce_angle_multiplier = bounce_angle_multiplier_from_position(thing)
 
     if bounce_angle_multiplier >= 0.91 || bounce_angle_multiplier <= 0.09
       increase_speed
     end
 
-    (90 * bounce_angle_multiplier) + if touching_top_left?(paddle)
+    (90 * bounce_angle_multiplier) + if touching_top_left?(thing)
       90
-    elsif touching_top_right?(paddle)
+    elsif touching_top_right?(thing)
       0
-    elsif touching_bottom_left?(paddle)
+    elsif touching_bottom_left?(thing)
       180
     else
       270  # bottom right
     end
   end
 
-  def bounce_angle_multiplier_from_position(paddle)
-    percentage_of_distance_to_edge_from_middle = (paddle.mid_x - mid_x) / (paddle.width.to_f / 2)
+  def bounce_angle_multiplier_from_position(thing)
+    percentage_of_distance_to_edge_from_middle = (thing.mid_x - mid_x) / (thing.width.to_f / 2)
 
     if percentage_of_distance_to_edge_from_middle < 0
       [0.05, 1 + percentage_of_distance_to_edge_from_middle].max

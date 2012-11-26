@@ -1,21 +1,26 @@
 require File.dirname(__FILE__) + '/ball'
 require File.dirname(__FILE__) + '/paddle'
+require File.dirname(__FILE__) + '/level'
+require File.dirname(__FILE__) + '/block'
 require File.dirname(__FILE__) + '/collision_methods'
 
 class ArkanoidGame < Gosu::Window
   def initialize
     super 640, 480, false
     self.caption = "Ruby Arkanoid!"
-    @bg = Gosu::Image.new(self, "assets/bg.png", true)
+    
+    @levels = Level.load_all(self)
+    @level = @levels.first
     @ball = Ball.new('assets/ball.png', self)
     @paddle = Paddle.new('assets/paddle.png', self)
     @ball.bind_to_paddle! @paddle
+
 
     @font = Gosu::Font.new(self, Gosu::default_font_name, 20)
   end
 
   def draw
-    @bg.draw(0, 0, ZOrder::Background)
+    @level.draw
     @ball.draw
     @paddle.draw
     @font.draw("RArkanoid (ESC to exit) x: #{@ball.x.to_i}, y: #{@ball.y.to_i}, angle: #{@ball.angle}", 8, height - 30, ZOrder::UI, 1.0, 1.0, 0xffffff00)
@@ -26,7 +31,11 @@ class ArkanoidGame < Gosu::Window
 
     catch :out_of_bounds do
       @paddle.handle_input
-      @ball.update(@paddle)
+      @ball.update
+
+      @ball.update_angle(@paddle) if @ball.touching?(@paddle)
+      @ball.update_angle(@level.last_collided_block) if @level.had_block_collision?(@ball)
+
       return
     end
     @paddle.reset!
@@ -35,5 +44,5 @@ class ArkanoidGame < Gosu::Window
 end
 
 module ZOrder
-  Background, Ball, Paddle, UI = *0..3
+  Background, Ball, Paddle, Block, UI = *0..4
 end

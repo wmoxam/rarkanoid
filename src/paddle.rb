@@ -34,9 +34,7 @@ class Paddle
     @x += delta
     @bound_ball.x += delta if @bound_ball
 
-    if @window.button_down?(Gosu::KbSpace)
-      release_ball!
-    end
+    release_ball! if @window.button_down?(Gosu::KbSpace)
   end
 
   def release_ball!
