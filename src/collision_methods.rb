@@ -43,6 +43,51 @@ module CollisionMethods
     touching_right?(thing) && touching_bottom?(thing)
   end
 
+  def overlap_right?(thing)
+    right < thing.right && right >= thing.left && touching_y?(thing)
+  end
+
+  def overlap_left?(thing)
+    left > thing.right && left <= thing.left && touching_y?(thing)
+  end
+
+  def overlap_top?(thing)
+    top <= thing.bottom && top >= thing.top && touching_x?(thing)
+  end
+
+  def overlap_bottom?(thing)
+    bottom >= thing.top && bottom < thing.bottom && touching_x?(thing)
+  end
+
+  # which edge is being touched the most
+  def touching_edge(thing)
+    { :right  => right_edge_overlap(thing),
+      :left   => left_edge_overlap(thing),
+      :top    => top_edge_overlap(thing),
+      :bottom => bottom_edge_overlap(thing),
+    }.max_by {|k,v| v }.first
+  end
+
+  def right_edge_overlap(thing)
+    return 0 unless overlap_right?(thing)
+    [bottom, thing.bottom].min - [top, thing.top].max
+  end
+
+  def left_edge_overlap(thing)
+    return 0 unless overlap_left?(thing)
+    [bottom, thing.bottom].min - [top, thing.top].max
+  end
+
+  def top_edge_overlap(thing)
+    return 0 unless overlap_top?(thing)
+    [right, thing.right].max - [left, thing.left].min
+  end
+
+  def bottom_edge_overlap(thing)
+    return 0 unless overlap_bottom?(thing)
+     [right, thing.right].max - [left, thing.left].min
+  end
+
   def mid_x
     @x + (@width / 2)
   end

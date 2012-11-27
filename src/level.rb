@@ -18,7 +18,6 @@ class Level
 
       block_row 
     end.flatten.compact
-puts @blocks.inspect
 
     @last_collided_block = nil
   end
@@ -35,8 +34,9 @@ puts @blocks.inspect
   end
 
   def had_block_collision?(ball)
-    @blocks.each do |block|
+    @blocks.select(&:alive?).each do |block|
       if ball.touching?(block)
+        block.touch!
         @last_collided_block = block
         return true
       end

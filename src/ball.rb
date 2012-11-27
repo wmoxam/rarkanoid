@@ -23,6 +23,8 @@ class Ball
     @x += @speed * Math.cos(@angle * Math::PI / 180)
     @y -= @speed * Math.sin(@angle * Math::PI / 180)
 
+    @x = [max_x, [0, @x].max].min
+
     @angle = if @last_touched == touching_wall
       @angle
     elsif touching_any_wall?
@@ -60,47 +62,28 @@ class Ball
   end
 
   def update_angle(thing)
-    @angle = angle_from_touched_position(thing)
+    @angle, hit_edge = thing.angle_from_touched_position(self)
+    increase_speed!
   end
 
-  def angle_from_touched_position(thing)
-    bounce_angle_multiplier = bounce_angle_multiplier_from_position(thing)
-
-    if bounce_angle_multiplier >= 0.91 || bounce_angle_multiplier <= 0.09
-      increase_speed
-    end
-
-    (90 * bounce_angle_multiplier) + if touching_top_left?(thing)
-      90
-    elsif touching_top_right?(thing)
-      0
-    elsif touching_bottom_left?(thing)
-      180
-    else
-      270  # bottom right
-    end
-  end
-
-  def bounce_angle_multiplier_from_position(thing)
-    percentage_of_distance_to_edge_from_middle = (thing.mid_x - mid_x) / (thing.width.to_f / 2)
-
-    if percentage_of_distance_to_edge_from_middle < 0
-      [0.05, 1 + percentage_of_distance_to_edge_from_middle].max
-    else
-      [percentage_of_distance_to_edge_from_middle, 0.95].min
-    end
-  end
-
-  def out_of_bounds?
+    def out_of_bounds?
     top > @window.height + 30  # add some room to see the ball disappear
   end
 
+  def max_x
+    @window.width
+  end
+
+  def min_x
+    0
+  end
+
   def touching_container_right_side?
-    right > @window.width
+    right >= max_x
   end
 
   def touching_container_left_side?
-    left < 0
+    left <= min_x
   end
 
   def touching_container_top?
@@ -111,14 +94,14 @@ class Ball
     !touching_wall.nil?
   end
 
-  def increase_speed
+  def increase_speed!
     return if @speed >= 9
-    @speed += 1
+    @speed += 0.5
   end
 
-  def decrease_speed
+  def decrease_speed!
     return if @speed <= 3
-    @speed -= 1
+    @speed -= 0.5
   end
 
   def bind_to_paddle!(paddle)
@@ -127,7 +110,7 @@ class Ball
     @state = :bound_to_paddle
     @speed = 0
     @bound_to_paddle = true
-    @x = paddle.x + ((paddle.width * 3 )/ 4)
+    @x = paddle.x + (paddle.width / 2)
     @y = paddle.y - (paddle.height / 2) - @height / 2 + 2
     @angle = 45
     @last_touched = nil
