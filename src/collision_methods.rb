@@ -80,12 +80,12 @@ module CollisionMethods
 
   def top_edge_overlap(thing)
     return 0 unless overlap_top?(thing)
-    [right, thing.right].max - [left, thing.left].min
+    [right, thing.right].min - [left, thing.left].max
   end
 
   def bottom_edge_overlap(thing)
     return 0 unless overlap_bottom?(thing)
-     [right, thing.right].max - [left, thing.left].min
+     [right, thing.right].min - [left, thing.left].max
   end
 
   def mid_x

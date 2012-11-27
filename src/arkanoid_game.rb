@@ -5,6 +5,8 @@ require File.dirname(__FILE__) + '/block'
 require File.dirname(__FILE__) + '/collision_methods'
 
 class ArkanoidGame < Gosu::Window
+  attr_accessor :dbg
+
   def initialize
     super 640, 480, false
     self.caption = "Ruby Arkanoid!"
@@ -23,7 +25,7 @@ class ArkanoidGame < Gosu::Window
     @level.draw
     @ball.draw
     @paddle.draw
-    @font.draw("RArkanoid (ESC to exit) x: #{@ball.x.to_i}, y: #{@ball.y.to_i}, angle: #{@ball.angle}", 8, height - 30, ZOrder::UI, 1.0, 1.0, 0xffffff00)
+    @font.draw("RArkanoid (ESC to exit) x: #{@ball.x.to_i}, y: #{@ball.y.to_i}, angle: #{@ball.angle}  ::: #{dbg}", 8, height - 30, ZOrder::UI, 1.0, 1.0, 0xffffff00)
   end
 
   def update

@@ -23,10 +23,15 @@ class Ball
     @x += @speed * Math.cos(@angle * Math::PI / 180)
     @y -= @speed * Math.sin(@angle * Math::PI / 180)
 
-    @x = [max_x, [0, @x].max].min
-
-    @angle = if @last_touched == touching_wall
-      @angle
+    @angle = if touching_any_wall? && @last_touched == touching_wall
+      case touching_wall
+      when :right
+        135
+      when :left
+        45
+      when :top
+        225
+      end
     elsif touching_any_wall?
       (360 + (2 * wall_angle) - @angle) % 360
     else
@@ -34,7 +39,7 @@ class Ball
     end
 
     throw :out_of_bounds if out_of_bounds?
-    
+
     @last_touched = touching_wall
   end
 
@@ -110,10 +115,9 @@ class Ball
     @state = :bound_to_paddle
     @speed = 0
     @bound_to_paddle = true
-    @x = paddle.x + (paddle.width / 2)
+    @x = paddle.x + (paddle.width * 3.0 / 5.0)
     @y = paddle.y - (paddle.height / 2) - @height / 2 + 2
     @angle = 45
-    @last_touched = nil
   end
 
   def bound_to_paddle?

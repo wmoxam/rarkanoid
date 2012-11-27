@@ -7,6 +7,7 @@ class Block
   attr_accessor :width, :height, :x, :y
 
   def initialize(base_dir, config, x, y, window)
+    @window = window #for debuggin
   	@tile = Gosu::Image.new(window, base_dir + '/' + config["tile"], true)
   	@x = x
   	@y = y
@@ -58,7 +59,7 @@ class Block
     when :left
       270
     when :top
-      90
+      360
     when :bottom
       180
     end
