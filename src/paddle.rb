@@ -1,13 +1,13 @@
-class Paddle
+class Paddle < Chingu::GameObject
   include CollisionMethods
 
   attr_accessor :width, :height, :x, :y
 
-  def initialize(image_path, window)
-    @image = Gosu::Image.new(window, image_path, false)
+  def initialize(image_path)
+    super()
+    @image = Gosu::Image[image_path]
     @width = @image.width
     @height = @image.height
-    @window = window
     @bound_ball = nil
     reset!
   end
@@ -22,19 +22,17 @@ class Paddle
     @image.draw(@x, @y, ZOrder::Paddle)
   end
 
-  def handle_input
-    delta = if @window.button_down?(Gosu::KbLeft) && left > 0
-      -8
-    elsif @window.button_down?(Gosu::KbRight) && right < @window.width
-      8
-    else
-      0
-    end
+  def move_left
+    move(left > 0 ? -8 : 0)
+  end
 
+  def move_right
+    move(right < $window.width ? 8 : 0)
+  end
+
+  def move(delta)
     @x += delta
     @bound_ball.x += delta if @bound_ball
-
-    release_ball! if @window.button_down?(Gosu::KbSpace)
   end
 
   def release_ball!

@@ -1,9 +1,15 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
+require "rubygems"
+require "bundler/setup"
+
+require "logger"
 require 'gosu'
+require "chingu"
 
-require File.dirname(__FILE__) + '/src/arkanoid_game'
+require 'pry'
 
-game = ArkanoidGame.new
-game.show
+ROOT_PATH = File.dirname(File.expand_path(__FILE__))
+require_all "#{ROOT_PATH}/src"
+
+ArkanoidGame.new.show

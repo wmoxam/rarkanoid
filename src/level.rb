@@ -1,15 +1,21 @@
 require 'yaml'
 
-class Level
+class Level < Chingu::GameObject
   attr_accessor :last_collided_block
 
-  def initialize(base_dir, config, window)
-  	@background = Gosu::Image.new(window, base_dir + '/' + config["background"], true)
+  def initialize(base_dir, config)
+    super()
+    
+    @base_dir = base_dir
+    @config = config
+    
+    @image = Gosu::Image[@base_dir + '/' + @config["background"]]
+    
     y = 3
-  	@blocks = config["rows"].collect do |row|
+  	@blocks = @config["rows"].collect do |row|
       x = 3
       block_row = row.split(//).collect do |symbol|
-        block = Block.get_block(symbol, x, y, window)
+        block = Block.get_block(symbol, x, y)
         x += Block::WIDTH + 3
         block
       end
@@ -18,19 +24,19 @@ class Level
 
       block_row 
     end.flatten.compact
-
     @last_collided_block = nil
+    
   end
-
-  def self.load_all(window)
-  	Dir["data/levels/*/config.yaml"].collect do |config_file|
-  	  new(File.dirname(config_file), YAML.load_file(config_file), window)
-    end
-  end
-
+  
   def draw
-  	@background.draw(0, 0, ZOrder::Background)
-    @blocks.each(&:draw)
+    @image.draw(0, 0, ZOrder::Background)
+    @blocks.each {|b| b.draw }
+  end
+
+  def self.load_all
+  	Dir["data/levels/*/config.yaml"].collect do |config_file|
+  	  new(File.dirname(config_file), YAML.load_file(config_file))
+    end
   end
 
   def had_block_collision?(ball)

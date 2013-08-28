@@ -1,4 +1,4 @@
-class Block
+class Block < Chingu::GameObject
   include CollisionMethods
 
   WIDTH = 40
@@ -6,9 +6,8 @@ class Block
 
   attr_accessor :width, :height, :x, :y
 
-  def initialize(base_dir, config, x, y, window)
-    @window = window #for debuggin
-  	@tile = Gosu::Image.new(window, base_dir + '/' + config["tile"], true)
+  def initialize(base_dir, config, x, y)
+  	@tile = Gosu::Image[base_dir + '/' + config["tile"]]
   	@x = x
   	@y = y
   	@width = WIDTH # blocks are fixed dimensions
@@ -16,10 +15,10 @@ class Block
   	@alive = true
   end
 
-  def self.get_block(symbol, x, y, window)
+  def self.get_block(symbol, x, y)
   	config, base_dir = yaml_config(symbol)
   	return nil if config.nil?
-  	new(base_dir, config, x, y, window)
+  	new(base_dir, config, x, y)
   end
 
   def self.yaml_config(symbol)
@@ -34,6 +33,7 @@ class Block
 
   def draw
   	@tile.draw(@x, @y, ZOrder::Block) if drawable?
+    super
   end
 
   def alive?

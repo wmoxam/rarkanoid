@@ -1,15 +1,14 @@
 require File.dirname(__FILE__) + '/collision_methods'
 
-class Ball
+class Ball < Chingu::GameObject
   include CollisionMethods
 
   attr_accessor :angle, :x, :y
 
-  def initialize(image_path, window)
-    @image = Gosu::Image.new(window, image_path, false)
+  def initialize(image_path)
+    @image = Gosu::Image[image_path]
     @width = @image.width
     @height = @image.height
-    @window = window
     @state = nil
   end
 
@@ -17,7 +16,9 @@ class Ball
     @image.draw(@x, @y, ZOrder::Ball)
   end
 
-  def update()
+  def update
+    super
+    
     return if bound_to_paddle?
 
     @x += @speed * Math.cos(@angle * Math::PI / 180)
@@ -72,11 +73,11 @@ class Ball
   end
 
     def out_of_bounds?
-    top > @window.height + 30  # add some room to see the ball disappear
+    top > $window.height + 30  # add some room to see the ball disappear
   end
 
   def max_x
-    @window.width
+    $window.width
   end
 
   def min_x
